@@ -1,10 +1,9 @@
 #include<stdio.h>
-char stack[1000]; int sp=-1;
-char newexp[100];
+char postfixExpr[100];
 
-int pr(char sym)
+int priority(char symbol)
 {
-    switch(sym)
+    switch(symbol)
     {
     case '(':
         return 0;
@@ -19,55 +18,59 @@ int pr(char sym)
     }
 }
 
-void postfixconvert(char exp[])
+void postfixConvert(char expr[])
 {
-    int i,p=0;
-    char nextval;
-    char sym;
-    for(i=0;i<strlen(exp)-1;i++)
+    char stack[1000]; int stackPointer=-1;
+    int index,pointer=0;
+    char nextvalue;
+    char symbol;
+    for(index=0;index<strlen(expr)-1;index++)
     {
-        sym=exp[i];
-        if(sym!=' ')
+        symbol=expr[index];
+        if(symbol!=' ')
         {
-            switch(sym)
+            switch(symbol)
             {
             case '(':
-                stack[++sp]=sym;
+                stack[++stackPointer]=symbol;
                 break;
             case ')':
-                while((nextval=stack[sp--])!='(')
-                    newexp[p++] = nextval;
+                while((nextvalue=stack[stackPointer--])!='(')
+                    postfixExpr[pointer++] = nextvalue;
                 break;
             case '|':
             case '&':
             case '!':
-                while(sp!=-1 &&  pr(stack[sp])>= pr(sym))
-                    newexp[p++]=stack[sp--];
-                stack[++sp]=sym;
+                while(stackPointer!=-1 &&  priority(stack[stackPointer])>= priority(symbol))
+                    postfixExpr[pointer++]=stack[stackPointer--];
+                stack[++stackPointer]=symbol;
                 break;
             default:
-                newexp[p++]=sym;
+                postfixExpr[pointer++]=symbol;
             }
 
         }
 
     }
-    while(sp!=-1)
-        newexp[p++]=stack[sp--];
-    newexp[p]='\0';
+    while(stackPointer!=-1)
+        postfixExpr[pointer++]=stack[stackPointer--];
+    postfixExpr[pointer]='\0';
 }
-int evaluate(char temp[],int l, int h)
+int evaluate(char expr[],int low, int high)
 {
 
 }
 int main (void)
 {
-    char exp[100];
-    int res=-1;
+    char expr[100];
+    int result=-1;
     printf("\nEnter the expression: ");
-    fgets(&exp,100,stdin);
-    postfixconvert(exp);
-    evaluate(newexp, 0, strlen(newexp)-1);
+    fgets(&expr,100,stdin);
+    postfixConvert(expr);
+    printf("Postfix: %s",postfixExpr);
+    evaluate(postfixExpr, 0, strlen(postfixExpr)-1);
 
     return 0;
 }
+
+
